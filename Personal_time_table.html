@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Timetable</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timetable {
+            display: grid;
+            grid-template-columns: 120px repeat(7, 1fr);
+            gap: 1px;
+            background: #e0e6ed;
+            margin: 0;
+        }
+
+        .time-header, .day-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 15px 10px;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+            font-size: 1rem;
+        }
+
+        .time-slot {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 8px;
+            font-weight: 500;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            writing-mode: horizontal-tb;
+        }
+
+        .cell {
+            background: white;
+            padding: 12px 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Color coding for different activities */
+        .breakfast {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .lunch, .dinner {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .lecture {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .lab {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .study {
+            background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .revision {
+            background: linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%);
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .personal {
+            background: linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .free-time {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .prep {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .coding {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .chill {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .timetable {
+                font-size: 0.8rem;
+            }
+            .cell {
+                padding: 8px 4px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .timetable {
+                grid-template-columns: 80px repeat(7, 1fr);
+                font-size: 0.7rem;
+            }
+            .cell {
+                padding: 6px 3px;
+                font-size: 0.65rem;
+                min-height: 50px;
+            }
+            .time-slot, .day-header {
+                padding: 10px 5px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Weekly Academic Schedule</h1>
+            <p>Physics & Computer Science Study Timetable</p>
+        </div>
+        
+        <div class="timetable">
+            <!-- Header row -->
+            <div class="time-header">Time</div>
+            <div class="day-header">Monday</div>
+            <div class="day-header">Tuesday</div>
+            <div class="day-header">Wednesday</div>
+            <div class="day-header">Thursday</div>
+            <div class="day-header">Friday</div>
+            <div class="day-header">Saturday</div>
+            <div class="day-header">Sunday</div>
+
+            <!-- 7:00-8:00 -->
+            <div class="time-slot">7:00–8:00</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+            <div class="cell prep">Wake + prep</div>
+
+            <!-- 8:00-8:15 -->
+            <div class="time-slot">8:00–8:15</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+            <div class="cell breakfast">🍽️ Breakfast</div>
+
+            <!-- 8:15-8:30 -->
+            <div class="time-slot">8:15–8:30</div>
+            <div class="cell study">Quick review</div>
+            <div class="cell study">Quick review</div>
+            <div class="cell personal">Walk / relax</div>
+            <div class="cell study">Quick review</div>
+            <div class="cell personal">Walk / relax</div>
+            <div class="cell study">Daily plan setup</div>
+            <div class="cell study">Daily plan setup</div>
+
+            <!-- 8:30-10:00 -->
+            <div class="time-slot">8:30–10:00</div>
+            <div class="cell lecture">Relativity (9:30)</div>
+            <div class="cell lecture">Relativity (10:30)</div>
+            <div class="cell lecture">QM-II (8:30)</div>
+            <div class="cell lecture">Stat Mech (8:30)</div>
+            <div class="cell lecture">Stat Mech (9:30)</div>
+            <div class="cell revision">📘 Revise: Stat Mech</div>
+            <div class="cell revision">📘 Revise: QM/Relativity</div>
+
+            <!-- 10:00-11:30 -->
+            <div class="time-slot">10:00–11:30</div>
+            <div class="cell lecture">Stat Mech (11:30)</div>
+            <div class="cell coding">DSA coding practice</div>
+            <div class="cell lecture">Relativity (11:30)</div>
+            <div class="cell revision">Revise P303 concepts</div>
+            <div class="cell lecture">QM-II (10:30)</div>
+            <div class="cell coding">🧮 Algorithms: practice</div>
+            <div class="cell personal">🛋️ Personal / journaling</div>
+
+            <!-- 11:30-1:00 -->
+            <div class="time-slot">11:30–1:00</div>
+            <div class="cell prep">QM-II (1:30) prep</div>
+            <div class="cell prep">Stat Mech (1:30) prep</div>
+            <div class="cell prep">CS301 prep</div>
+            <div class="cell revision">QM-II revision</div>
+            <div class="cell study">Relativity problems</div>
+            <div class="cell coding">P346 coding project</div>
+            <div class="cell personal">Relax + notes cleanup</div>
+
+            <!-- 1:00-1:30 -->
+            <div class="time-slot">1:00–1:30</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+            <div class="cell lunch">🍽️ Lunch</div>
+
+            <!-- 1:30-2:30 -->
+            <div class="time-slot">1:30–2:30</div>
+            <div class="cell lecture">QM-II (1:30)</div>
+            <div class="cell lecture">Stat Mech (1:30)</div>
+            <div class="cell personal">Break / short nap</div>
+            <div class="cell lecture">Relativity (1:30)</div>
+            <div class="cell revision">Recap + formula sheet</div>
+            <div class="cell coding">Project dev / plotting</div>
+            <div class="cell free-time">✨ Free time</div>
+
+            <!-- 2:30-5:30 -->
+            <div class="time-slot">2:30–5:30</div>
+            <div class="cell lab">Lab (P343/P345)</div>
+            <div class="cell lab">Lab (P343/P345)</div>
+            <div class="cell lab">Lab (P346)</div>
+            <div class="cell lab">Lab (P346)</div>
+            <div class="cell study">Catch up + free slot</div>
+            <div class="cell coding">Deep work (P346/DSA)</div>
+            <div class="cell chill">🧘 Chill or catch up</div>
+
+            <!-- 5:30-7:30 -->
+            <div class="time-slot">5:30–7:30</div>
+            <div class="cell lecture">CS301 (5:30)</div>
+            <div class="cell coding">Algorithms problems</div>
+            <div class="cell coding">Algorithms practice</div>
+            <div class="cell lecture">CS301 (6:30)</div>
+            <div class="cell revision">Mock paper / notes</div>
+            <div class="cell coding">Review / debug code</div>
+            <div class="cell study">Plan week + Q&A recap</div>
+
+            <!-- 8:00-8:30 -->
+            <div class="time-slot">8:00–8:30</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+            <div class="cell dinner">🍽️ Dinner</div>
+
+            <!-- 8:30-10:30 -->
+            <div class="time-slot">8:30–10:30</div>
+            <div class="cell revision">📘 Review key topics</div>
+            <div class="cell study">Peer discussion</div>
+            <div class="cell revision">Light revision</div>
+            <div class="cell study">Read paper / notes</div>
+            <div class="cell personal">Chill + light work</div>
+            <div class="cell free-time">🌙 Movie / hobby</div>
+            <div class="cell study">🎯 Revise + plan Monday</div>
+
+            <!-- 10:30-11:00 -->
+            <div class="time-slot">10:30–11:00</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+            <div class="cell personal">📱 Personal time</div>
+        </div>
+    </div>
+</body>
+</html>
