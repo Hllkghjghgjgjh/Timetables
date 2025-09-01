@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Numerical Methods Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            justify-content: center;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .input-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .input-section h3 {
+            color: #334155;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .matrix-input-group {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .matrix-size-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .size-control label {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .size-control input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .matrix-container {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 2fr 1fr;
+        }
+        
+        .matrix-grid {
+            display: grid;
+            gap: 5px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+        }
+        
+        .matrix-cell {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .matrix-cell:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+        
+        .vector-grid {
+            display: grid;
+            gap: 5px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+        }
+        
+        .method-selection {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+        }
+        
+        .method-selection h4 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        
+        .method-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .preset-btn {
+            padding: 8px 16px;
+            background: #e0e7ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .preset-btn:hover {
+            background: #c7d2fe;
+            transform: translateY(-1px);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+            min-width: 200px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .calculate-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .convergence-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .converged {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .not-converged {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .iterations-count {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .solution-display {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-line;
+            margin: 10px 0;
+        }
+        
+        .matrix-display {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .settings-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            margin-bottom: 20px;
+        }
+        
+        .settings-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .setting-group label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .setting-group input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .matrix-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Interactive Numerical Methods</h1>
+            <p>Solve linear systems with Cholesky, Jacobi & Gauss-Seidel methods</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('solver')">🔢 Matrix Solver</button>
+            <button class="tab" onclick="switchTab('examples')">📚 Examples</button>
+            <button class="tab" onclick="switchTab('help')">❓ Help</button>
+        </div>
+
+        <!-- Solver Tab -->
+        <div id="solver-tab" class="tab-content active">
+            <div class="input-section">
+                <h3>Matrix Input</h3>
+                
+                <div class="matrix-size-controls">
+                    <div class="size-control">
+                        <label>Matrix Size:</label>
+                        <input type="number" id="matrix-size" min="2" max="10" value="3" onchange="updateMatrixSize()">
+                        <span>×</span>
+                        <input type="number" id="matrix-size-display" min="2" max="10" value="3" disabled>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="loadExample('example1')">Load Example 1 (6×6)</button>
+                        <button class="preset-btn" onclick="loadExample('example2')">Load Example 2 (5×5)</button>
+                        <button class="preset-btn" onclick="generateRandom()">Random Matrix</button>
+                        <button class="preset-btn" onclick="clearMatrix()">Clear</button>
+                    </div>
+                </div>
+
+                <div class="matrix-container">
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #374151;">Coefficient Matrix A</h4>
+                        <div id="matrix-grid" class="matrix-grid"></div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #374151;">Constants Vector b</h4>
+                        <div id="vector-grid" class="vector-grid"></div>
+                        
+                        <div class="method-selection" style="margin-top: 20px;">
+                            <h4>Select Methods</h4>
+                            <div class="method-checkboxes">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="cholesky-method" checked>
+                                    Cholesky Decomposition
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="jacobi-method" checked>
+                                    Jacobi Method
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="gauss-seidel-method" checked>
+                                    Gauss-Seidel Method
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                <h4 style="margin-bottom: 15px; color: #374151;">Method Settings</h4>
+                <div class="settings-row">
+                    <div class="setting-group">
+                        <label>Tolerance</label>
+                        <input type="number" id="tolerance" value="0.000001" step="0.000001" min="0.000001">
+                    </div>
+                    <div class="setting-group">
+                        <label>Max Iterations</label>
+                        <input type="number" id="max-iterations" value="100" min="1" max="1000">
+                    </div>
+                    <div class="setting-group">
+                        <label>Decimal Precision</label>
+                        <input type="number" id="precision" value="6" min="1" max="12">
+                    </div>
+                </div>
+            </div>
+
+            <button id="calculate-btn" class="calculate-btn" onclick="calculateSolution()">
+                🚀 Calculate Solution
+            </button>
+
+            <div id="results" class="results-section" style="display: none;">
+                <h3 style="margin-bottom: 20px; color: #334155;">Results</h3>
+                <div id="results-container"></div>
+            </div>
+        </div>
+
+        <!-- Examples Tab -->
+        <div id="examples-tab" class="tab-content">
+            <div class="input-section">
+                <h3>Example Problems</h3>
+                <div style="display: grid; gap: 20px;">
+                    <div class="result-card">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">Example 1: Symmetric Matrix (6×6)</h4>
+                        <p style="margin-bottom: 15px;">A symmetric positive definite matrix suitable for all three methods.</p>
+                        <div class="matrix-display">Matrix A:
+[ 4 -1  0 -1  0  0]
+[-1  4 -1  0 -1  0]
+[ 0 -1  4  0  0 -1]
+[-1  0  0  4 -1  0]
+[ 0 -1  0 -1  4 -1]
+[ 0  0 -1  0 -1  4]
+
+Vector b: [2, 1, 2, 2, 1, 2]</div>
+                        <button class="preset-btn" onclick="loadExample('example1'); switchTab('solver')">Load This Example</button>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">Example 2: General Matrix (5×5)</h4>
+                        <p style="margin-bottom: 15px;">A general matrix for testing Jacobi and Gauss-Seidel methods.</p>
+                        <div class="matrix-display">Matrix C:
+[11  3  0  1  2]
+[ 0  4  2  0  1]
+[ 3  2  7  1  0]
+[ 4  0  4 10  1]
+[ 2  5  1  3 13]
+
+Vector d: [51, 15, 15, 20, 92]</div>
+                        <button class="preset-btn" onclick="loadExample('example2'); switchTab('solver')">Load This Example</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Tab -->
+        <div id="help-tab" class="tab-content">
+            <div class="input-section">
+                <h3>How to Use</h3>
+                <div style="display: grid; gap: 20px;">
+                    <div class="result-card">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🔢 Matrix Input</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li>Set the matrix size using the size control</li>
+                            <li>Enter matrix coefficients and constants vector</li>
+                            <li>Use preset examples or generate random matrices</li>
+                            <li>Select which numerical methods to apply</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🧮 Methods Explained</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li><strong>Cholesky Decomposition:</strong> Direct method for symmetric positive definite matrices</li>
+                            <li><strong>Jacobi Method:</strong> Iterative method using simultaneous updates</li>
+                            <li><strong>Gauss-Seidel Method:</strong> Iterative method using sequential updates</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">⚙️ Settings</h4>
+                        <ul style="margin-left: 20px; line-height: 1.6;">
+                            <li><strong>Tolerance:</strong> Convergence threshold for iterative methods</li>
+                            <li><strong>Max Iterations:</strong> Maximum number of iterations allowed</li>
+                            <li><strong>Decimal Precision:</strong> Number of decimal places in results</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let matrixSize = 3;
+        
+        // Initialize the application
+        function init() {
+            updateMatrixSize();
+        }
+        
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Update matrix size and regenerate grids
+        function updateMatrixSize() {
+            matrixSize = parseInt(document.getElementById('matrix-size').value);
+            document.getElementById('matrix-size-display').value = matrixSize;
+            generateMatrixGrid();
+            generateVectorGrid();
+        }
+        
+        // Generate matrix input grid
+        function generateMatrixGrid() {
+            const grid = document.getElementById('matrix-grid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${matrixSize}, 1fr)`;
+            
+            for (let i = 0; i < matrixSize; i++) {
+                for (let j = 0; j < matrixSize; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.step = '0.001';
+                    input.className = 'matrix-cell';
+                    input.id = `matrix-${i}-${j}`;
+                    input.placeholder = `a${i+1}${j+1}`;
+                    input.value = i === j ? '1' : '0'; // Initialize as identity matrix
+                    grid.appendChild(input);
+                }
+            }
+        }
+        
+        // Generate vector input grid
+        function generateVectorGrid() {
+            const grid = document.getElementById('vector-grid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateRows = `repeat(${matrixSize}, 1fr)`;
+            
+            for (let i = 0; i < matrixSize; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = '0.001';
+                input.className = 'matrix-cell';
+                input.id = `vector-${i}`;
+                input.placeholder = `b${i+1}`;
+                input.value = '1';
+                grid.appendChild(input);
+            }
+        }
+        
+        // Load example matrices
+        function loadExample(exampleName) {
+            if (exampleName === 'example1') {
+                document.getElementById('matrix-size').value = 6;
+                updateMatrixSize();
+                
+                const matrixA = [
+                    [4, -1, 0, -1, 0, 0],
+                    [-1, 4, -1, 0, -1, 0],
+                    [0, -1, 4, 0, 0, -1],
+                    [-1, 0, 0, 4, -1, 0],
+                    [0, -1, 0, -1, 4, -1],
+                    [0, 0, -1, 0, -1, 4]
+                ];
+                const vectorB = [2, 1, 2, 2, 1, 2];
+                
+                fillMatrix(matrixA, vectorB);
+            } else if (exampleName === 'example2') {
+                document.getElementById('matrix-size').value = 5;
+                updateMatrixSize();
+                
+                const matrixC = [
+                    [11, 3, 0, 1, 2],
+                    [0, 4, 2, 0, 1],
+                    [3, 2, 7, 1, 0],
+                    [4, 0, 4, 10, 1],
+                    [2, 5, 1, 3, 13]
+                ];
+                const vectorD = [51, 15, 15, 20, 92];
+                
+                fillMatrix(matrixC, vectorD);
+            }
+        }
+        
+        // Fill matrix and vector inputs with values
+        function fillMatrix(matrix, vector) {
+            for (let i = 0; i < matrixSize; i++) {
+                for (let j = 0; j < matrixSize; j++) {
+                    document.getElementById(`matrix-${i}-${j}`).value = matrix[i][j];
+                }
+                document.getElementById(`vector-${i}`).value = vector[i];
+            }
+        }
+        
+        // Generate random matrix
+        function generateRandom() {
+            for (let i = 0; i < matrixSize; i++) {
+                for (let j = 0; j < matrixSize; j++) {
+                    const value = Math.random() * 20 - 10; // Random between -10 and 10
+                    document.getElementById(`matrix-${i}-${j}`).value = value.toFixed(2);
+                }
+                const vectorValue = Math.random() * 20 - 10;
+                document.getElementById(`vector-${i}`).value = vectorValue.toFixed(2);
+            }
+            
+            // Make diagonal dominant for convergence
+            for (let i = 0; i < matrixSize; i++) {
+                let sum = 0;
+                for (let j = 0; j < matrixSize; j++) {
+                    if (i !== j) {
+                        sum += Math.abs(parseFloat(document.getElementById(`matrix-${i}-${j}`).value));
+                    }
+                }
+                document.getElementById(`matrix-${i}-${i}`).value = (sum + Math.random() * 10 + 5).toFixed(2);
+            }
+        }
+        
+        // Clear matrix
+        function clearMatrix() {
+            for (let i = 0; i < matrixSize; i++) {
+                for (let j = 0; j < matrixSize; j++) {
+                    document.getElementById(`matrix-${i}-${j}`).value = i === j ? '1' : '0';
+                }
+                document.getElementById(`vector-${i}`).value = '1';
+            }
+        }
+        
+        // Get matrix from inputs
+        function getMatrix() {
+            const matrix = [];
+            for (let i = 0; i < matrixSize; i++) {
+                const row = [];
+                for (let j = 0; j < matrixSize; j++) {
+                    const value = parseFloat(document.getElementById(`matrix-${i}-${j}`).value) || 0;
+                    row.push(value);
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+        
+        // Get vector from inputs
+        function getVector() {
+            const vector = [];
+            for (let i = 0; i < matrixSize; i++) {
+                const value = parseFloat(document.getElementById(`vector-${i}`).value) || 0;
+                vector.push(value);
+            }
+            return vector;
+        }
+        
+        // Check if matrix is symmetric
+        function isSymmetric(matrix) {
+            const n = matrix.length;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (Math.abs(matrix[i][j] - matrix[j][i]) > 1e-10) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        // Cholesky decomposition
+        function choleskyDecomposition(A, b) {
+            const n = A.length;
+            
+            if (!isSymmetric(A)) {
+                return { error: "Matrix is not symmetric" };
+            }
+            
+            try {
+                // Initialize L matrix
+                const L = Array(n).fill().map(() => Array(n).fill(0));
+                
+                // Cholesky decomposition
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j <= i; j++) {
+                        if (i === j) {
+                            let sum = 0;
+                            for (let k = 0; k < j; k++) {
+                                sum += L[i][k] * L[i][k];
+                            }
+                            const value = A[i][i] - sum;
+                            if (value <= 0) {
+                                return { error: "Matrix is not positive definite" };
+                            }
+                            L[i][j] = Math.sqrt(value);
+                        } else {
+                            let sum = 0;
+                            for (let k = 0; k < j; k++) {
+                                sum += L[i][k] * L[j][k];
+                            }
+                            L[i][j] = (A[i][j] - sum) / L[j][j];
+                        }
+                    }
+                }
+                
+                // Forward substitution: Ly = b
+                const y = [];
+                for (let i = 0; i < n; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < i; j++) {
+                        sum += L[i][j] * y[j];
+                    }
+                    y.push((b[i] - sum) / L[i][i]);
+                }
+                
+                // Backward substitution: L^T * x = y
+                const x = Array(n).fill(0);
+                for (let i = n - 1; i >= 0; i--) {
+                    let sum = 0;
+                    for (let j = i + 1; j < n; j++) {
+                        sum += L[j][i] * x[j];
+                    }
+                    x[i] = (y[i] - sum) / L[i][i];
+                }
+                
+                return { solution: x, L: L, y: y };
+            } catch (error) {
+                return { error: "Cholesky decomposition failed: " + error.message };
+            }
+        }
+        
+        // Jacobi method
+        function jacobiMethod(A, b, maxIter, tolerance) {
+            const n = A.length;
+            let x = Array(n).fill(0);
+            let iterations = 0;
+            const iterationHistory = [];
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                const xNew = Array(n).fill(0);
+                
+                for (let i = 0; i < n; i++) {
+                    if (Math.abs(A[i][i]) < 1e-10) {
+                        return { error: `Zero diagonal element at position (${i+1},${i+1})` };
+                    }
+                    
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (j !== i) {
+                            sum += A[i][j] * x[j];
+                        }
+                    }
+                    xNew[i] = (b[i] - sum) / A[i][i];
+                }
+                
+                // Check convergence
+                let maxDiff = 0;
+                for (let i = 0; i < n; i++) {
+                    maxDiff = Math.max(maxDiff, Math.abs(xNew[i] - x[i]));
+                }
+                
+                iterationHistory.push([...xNew]);
+                x = xNew;
+                iterations = iter + 1;
+                
+                if (maxDiff < tolerance) {
+                    return { solution: x, iterations: iterations, converged: true, history: iterationHistory };
+                }
+            }
+            
+            return { solution: x, iterations: iterations, converged: false, history: iterationHistory };
+        }
+        
+        // Gauss-Seidel method
+        function gaussSeidelMethod(A, b, maxIter, tolerance) {
+            const n = A.length;
+            let x = Array(n).fill(0);
+            let iterations = 0;
+            const iterationHistory = [];
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                const xOld = [...x];
+                
+                for (let i = 0; i < n; i++) {
+                    if (Math.abs(A[i][i]) < 1e-10) {
+                        return { error: `Zero diagonal element at position (${i+1},${i+1})` };
+                    }
+                    
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        if (j !== i) {
+                            sum += A[i][j] * x[j];
+                        }
+                    }
+                    x[i] = (b[i] - sum) / A[i][i];
+                }
+                
+                iterationHistory.push([...x]);
+                
+                // Check convergence
+                let converged = true;
+                for (let i = 0; i < n; i++) {
+                    if (Math.abs(x[i] - xOld[i]) > tolerance) {
+                        converged = false;
+                        break;
+                    }
+                }
+                
+                iterations = iter + 1;
+                
+                if (converged) {
+                    return { solution: x, iterations: iterations, converged: true, history: iterationHistory };
+                }
+            }
+            
+            return { solution: x, iterations: iterations, converged: false, history: iterationHistory };
+        }
+        
+        // Format solution for display
+        function formatSolution(solution, precision) {
+            if (!solution) return "N/A";
+            return solution.map((val, idx) => 
+                `x${idx + 1} = ${val.toFixed(precision)}`
+            ).join('\n');
+        }
+        
+        // Format matrix for display
+        function formatMatrix(matrix, precision = 3) {
+            return matrix.map(row => 
+                '[' + row.map(val => val.toFixed(precision).padStart(8)).join(' ') + ']'
+            ).join('\n');
+        }
+        
+        // Calculate solution using selected methods
+        function calculateSolution() {
+            const matrix = getMatrix();
+            const vector = getVector();
+            const tolerance = parseFloat(document.getElementById('tolerance').value);
+            const maxIterations = parseInt(document.getElementById('max-iterations').value);
+            const precision = parseInt(document.getElementById('precision').value);
+            
+            const useCholesky = document.getElementById('cholesky-method').checked;
+            const useJacobi = document.getElementById('jacobi-method').checked;
+            const useGaussSeidel = document.getElementById('gauss-seidel-method').checked;
+            
+            const resultsContainer = document.getElementById('results-container');
+            const resultsSection = document.getElementById('results');
+            
+            // Show loading
+            const calcBtn = document.getElementById('calculate-btn');
+            calcBtn.innerHTML = '<div class="loading"></div> Calculating...';
+            calcBtn.disabled = true;
+            
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            resultsSection.style.display = 'block';
+            
+            setTimeout(() => {
+                try {
+                    // Cholesky Decomposition
+                    if (useCholesky) {
+                        const choleskyResult = choleskyDecomposition(matrix, vector);
+                        displayCholeskyResult(choleskyResult, precision);
+                    }
+                    
+                    // Jacobi Method
+                    if (useJacobi) {
+                        const jacobiResult = jacobiMethod(matrix, vector, maxIterations, tolerance);
+                        displayIterativeResult(jacobiResult, 'Jacobi Method', precision);
+                    }
+                    
+                    // Gauss-Seidel Method
+                    if (useGaussSeidel) {
+                        const gaussSeidelResult = gaussSeidelMethod(matrix, vector, maxIterations, tolerance);
+                        displayIterativeResult(gaussSeidelResult, 'Gauss-Seidel Method', precision);
+                    }
+                    
+                } catch (error) {
+                    resultsContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                }
+                
+                // Reset button
+                calcBtn.innerHTML = '🚀 Calculate Solution';
+                calcBtn.disabled = false;
+            }, 100);
+        }
+        
+        // Display Cholesky decomposition result
+        function displayCholeskyResult(result, precision) {
+            const container = document.getElementById('results-container');
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+            
+            if (result.error) {
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">Cholesky Decomposition</div>
+                    </div>
+                    <div class="error-message">${result.error}</div>
+                `;
+            } else {
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">Cholesky Decomposition</div>
+                        <div class="status-badge converged">Success</div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 8px; color: #374151;">Solution:</h4>
+                        <div class="solution-display">${formatSolution(result.solution, precision)}</div>
+                        
+                        <h4 style="margin-bottom: 8px; margin-top: 15px; color: #374151;">Lower Triangular Matrix L:</h4>
+                        <div class="matrix-display">${formatMatrix(result.L, precision)}</div>
+                        
+                        <h4 style="margin-bottom: 8px; margin-top: 15px; color: #374151;">Intermediate Vector y (Ly = b):</h4>
+                        <div class="solution-display">${formatSolution(result.y, precision)}</div>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(resultCard);
+        }
+        
+        // Display iterative method result
+        function displayIterativeResult(result, methodName, precision) {
+            const container = document.getElementById('results-container');
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+            
+            if (result.error) {
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">${methodName}</div>
+                    </div>
+                    <div class="error-message">${result.error}</div>
+                `;
+            } else {
+                const statusClass = result.converged ? 'converged' : 'not-converged';
+                const statusText = result.converged ? 'Converged' : 'Did not converge';
+                
+                let historyHtml = '';
+                if (result.history && result.history.length > 0) {
+                    const showIterations = Math.min(5, result.history.length);
+                    historyHtml = `
+                        <h4 style="margin-bottom: 8px; margin-top: 15px; color: #374151;">
+                            Iteration History (last ${showIterations} iterations):
+                        </h4>
+                        <div class="matrix-display">`;
+                    
+                    for (let i = Math.max(0, result.history.length - showIterations); i < result.history.length; i++) {
+                        historyHtml += `Iteration ${i + 1}:\n${formatSolution(result.history[i], precision)}\n\n`;
+                    }
+                    historyHtml += '</div>';
+                }
+                
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">${methodName}</div>
+                        <div class="convergence-info">
+                            <div class="status-badge ${statusClass}">${statusText}</div>
+                            <div class="iterations-count">${result.iterations} iterations</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 8px; color: #374151;">Final Solution:</h4>
+                        <div class="solution-display">${formatSolution(result.solution, precision)}</div>
+                        ${historyHtml}
+                    </div>
+                `;
+            }
+            
+            container.appendChild(resultCard);
+        }
+        
+        // Verify solution by substituting back into original equation
+        function verifySolution(matrix, vector, solution, precision) {
+            const n = matrix.length;
+            const result = [];
+            let maxError = 0;
+            
+            for (let i = 0; i < n; i++) {
+                let sum = 0;
+                for (let j = 0; j < n; j++) {
+                    sum += matrix[i][j] * solution[j];
+                }
+                result.push(sum);
+                maxError = Math.max(maxError, Math.abs(sum - vector[i]));
+            }
+            
+            return {
+                calculated: result,
+                original: vector,
+                maxError: maxError,
+                verification: result.map((val, idx) => 
+                    `Ax${idx + 1} = ${val.toFixed(precision)} (should be ${vector[idx].toFixed(precision)})`
+                ).join('\n')
+            };
+        }
+        
+        // Initialize the application when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
